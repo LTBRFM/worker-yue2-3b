@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import functools
 import json
 import os
 import random
@@ -120,7 +121,7 @@ def plan(takes: int, seed: int | None = None, cfg_scale: float | None = None) ->
 
 
 def make(style: str, lyrics: str, takes: int = 2, seed: int | None = None, cfg_scale: float | None = None,
-         clean_lyrics: bool = True, log=print) -> list[Path]:
+         clean_lyrics: bool = True, log=functools.partial(print, flush=True)) -> list[Path]:
     name, text = resolve_style(style)
     takes_ = plan(takes, seed, cfg_scale)
     ids = [submit(text, lyrics, t["seed"], t, clean_lyrics) for t in takes_]
