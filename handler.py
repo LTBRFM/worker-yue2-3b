@@ -9,7 +9,8 @@ Input (job["input"]):
     semantic_sampling, abc_sampling   dict, optional overrides of YuE2's sampling for the audio-token and the
                   score (ABC) stage: temperature, top_p, top_k, repetition_penalty. Defaults: semantic T 1.0,
                   top_p 0.95, top_k 100, rp 1.2; abc T 0.7, top_p 0.9, top_k 30, rp 1.005
-    ode_steps     int   = 32      audio synthesis steps (1-128); more may clean up the sound, and takes longer
+    ode_steps     int   = 64      audio synthesis steps (1-128); YuE2's own default is 32. 64 costs ~2 s more; by ear
+                  32/64/128 sound alike, 64 kept as a margin
     bitrate       str   = "192k"  lowered automatically if the MP3 would not fit in a job response
 
 Output: {audio_base64, format, seconds, gen_seconds, seed, cfg_scale, *_sampling, truncated, lyrics_sent, style_chars,
@@ -42,6 +43,7 @@ VAE_DIR = os.environ.get("YUE2_VAE_DIR", "/models/YuE2-Vae")  # baked into the i
 RUNPOD_CACHE = Path(os.environ.get("RUNPOD_HF_CACHE", "/runpod-volume/huggingface-cache/hub"))
 MAX_B64 = 9_000_000  # /run results cap at ~10 MB
 BITRATES = ["192k", "160k", "128k", "96k"]
+ODE_STEPS = 64
 SAMPLING_KEYS = {"temperature": float, "top_p": float, "top_k": int, "repetition_penalty": float}
 
 
@@ -90,7 +92,7 @@ def handler(job):
                 return {"error": f"{stage}: unknown keys {sorted(bad)}; allowed {sorted(SAMPLING_KEYS)}"}
             kw[stage] = {k: SAMPLING_KEYS[k](v) for k, v in inp[stage].items()}
 
-    steps = int(inp.get("ode_steps") or DEFAULT_CONFIG.ode_steps)
+    steps = int(inp.get("ode_steps") or ODE_STEPS)
     if not 1 <= steps <= 128:
         return {"error": "ode_steps must be 1-128"}
 

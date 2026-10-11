@@ -1,4 +1,10 @@
 {
+ "busker-tube-update": {
+  "label": "Busker tube update (spoken intro, guitar warm-up)",
+  "group": "simple",
+  "style": "English, street-corner acoustic busker, live and informal, opens with the busker casually tuning and noodling on his acoustic guitar while he speaks a relaxed spoken intro, then strums into a simple cheerful song, warm friendly male vocal, one acoustic guitar, no drums, natural open-air sound, 110 BPM",
+  "note": "the owner's pick: take B of 2026-10-11 (seed 1461912070, guidance 1.2)"
+ },
  "keyboard-man": {
   "label": "Simple: one man and a keyboard",
   "group": "simple",

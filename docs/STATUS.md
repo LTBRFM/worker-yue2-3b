@@ -20,6 +20,15 @@
 - **Not yet measured:** a cold start on a host that has never pulled the image. That happens when Runpod moves
   workers to new machines; expect minutes.
 
+## 2026-10-11: owner listening and fixes
+- **Verdict:** next to Suno, YuE2 sounds lifeless. It's for disposable one-off tracks, not hits.
+- **The busker style is the bullseye.** Preset `busker-tube-update`: a spoken intro over guitar tuning, then the song. It
+  came from take B, seed 1461912070, guidance 1.2. Spoken lines don't handle punctuation well, so keep them short and plain.
+- **Vocal artifacts:** the owner heard no difference between 32, 64 and 128 synthesis steps (`out/busker-fix/`).
+  The worker now defaults to 64 as a margin, which costs about 2 s per take.
+- **LTBR:** take A once mispronounced it. Re-made takes with "L T B R", "L-T-B-R" and "El Tee Bee Ar" all sounded
+  fine, so no respelling is needed.
+
 ## Next
 - Listen to the takes in `out/`. If take B's direction is wrong, change `TAKE_PLAN` in the client.
 - Possible: an LLM step that turns a news item into lyrics and the condensed style.
