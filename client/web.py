@@ -57,9 +57,9 @@ after a quiet spell waits for a worker to start. Each take costs about $0.03.</s
 vocal, instruments, tempo.</small></label><textarea id="style"></textarea>
 <label>Lyrics <small>[Verse] [Chorus] [Bridge] [Outro] tags; Suno-style notes in brackets are removed</small></label>
 <textarea id="lyrics">__EXAMPLE__</textarea>
-<div class="row"><div><label>Takes</label><input id="takes" type="number" min="1" max="5" value="2"></div>
+<div class="row"><div><label>Takes <small>A = defaults, B = guidance 1.2</small></label><input id="takes" type="number" min="1" max="6" value="2"></div>
 <div><label>Seed <small>blank = random</small></label><input id="seed" type="number"></div>
-<div><label>Guidance <small>blank = 1.0</small></label><input id="cfg" type="number" step="0.1"></div></div>
+<div><label>Guidance <small>blank = per take</small></label><input id="cfg" type="number" step="0.1"></div></div>
 <button>Make song</button></form><div id="reqs"></div>
 <script>
 const S=__STYLES__, $=id=>document.getElementById(id);
@@ -72,7 +72,7 @@ $('f').onsubmit=async e=>{e.preventDefault();
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function load(){const reqs=await (await fetch('/api/state')).json();
   $('reqs').innerHTML=reqs.map(q=>`<div class="req"><b>${esc(q.label)}</b> · ${q.takes} take(s) · ${q.when}${q.done?'':' · working…'}
-   ${q.files.map(f=>`<div><small>${esc(f)}</small><audio controls src="/out/${encodeURIComponent(f)}"></audio></div>`).join('')}
+   ${q.files.map(f=>`<div><small>take ${esc((f.match(/-([A-Z][0-9]*)-[0-9]+\\.mp3$/)||[,''])[1])} · ${esc(f)}</small><audio controls src="/out/${encodeURIComponent(f)}"></audio></div>`).join('')}
    <details ${q.done?'':'open'}><summary><small>log</small></summary><div class="log">${esc(q.log.join('\\n'))}</div></details></div>`).join('')}
 load(); setInterval(load,4000);
 </script></body></html>"""
@@ -114,7 +114,7 @@ class H(BaseHTTPRequestHandler):
         name = b.get("name") or "custom"
         style = b["style"].strip()
         label = ls.STYLES[name]["label"] if name in ls.STYLES and ls.STYLES[name]["style"] == style else "Custom style"
-        req = {"style": style, "lyrics": b["lyrics"], "takes": max(1, min(5, int(b.get("takes") or 1))),
+        req = {"style": style, "lyrics": b["lyrics"], "takes": max(1, min(6, int(b.get("takes") or 2))),
                "seed": b.get("seed"), "cfg": b.get("cfg"), "clean": True, "label": label,
                "when": time.strftime("%H:%M"), "done": False, "files": [], "log": []}
         with LOCK:

@@ -1,10 +1,12 @@
 """Make songs on the Runpod endpoint. Standard library only.
 
-    python client/ltbr_song.py --style up-and-out --lyrics client/example_lyrics.txt --takes 3
-    python client/ltbr_song.py --style "English, 1980s lovers rock, ..." --lyrics my.txt --seed 7
+    python client/ltbr_song.py --style up-and-out --lyrics client/example_lyrics.txt
+    python client/ltbr_song.py --style "English, 1980s lovers rock, ..." --lyrics my.txt --seed 7 --takes 4
 
---style is a preset name from styles.json or the style text itself. Each take is its own job, so takes run in
-parallel on as many workers as the endpoint allows. Songs land in out/ as <time>-<style>-<seed>.mp3 + .json.
+--style is a preset name from styles.json or the style text itself. Like Suno, one request gives 2 takes by
+default, each with different settings from TAKE_PLAN (more takes cycle through it with new seeds). Each take is
+its own job, so takes run in parallel on as many workers as the endpoint allows. Songs land in out/ as
+<time>-<style>-<take>-<seed>.mp3 + .json (the .json records every setting, so a take can be re-made exactly).
 
 Needs RUNPOD_API_KEY and LTBR_ENDPOINT_ID, from the environment or a .env file in the project root.
 """
@@ -14,6 +16,7 @@ import argparse
 import base64
 import json
 import os
+import random
 import re
 import sys
 import time
@@ -25,6 +28,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 STYLES = json.loads((ROOT / "styles.json").read_text())
 OUT = ROOT / "out"
+
+# One request = these takes. A is the bake-off's most reliable setting; B varies it the way that won on some songs
+# (Up and Out, Concrete Weather) though not on average. Change B here to explore other directions; the handler
+# also takes semantic_sampling / abc_sampling dicts (temperature, top_p, top_k, repetition_penalty).
+TAKE_PLAN = [
+    {"take": "A", "note": "model defaults (guidance 1.0)"},
+    {"take": "B", "note": "stronger style guidance (1.2)", "cfg_scale": 1.2},
+]
 
 
 def config() -> tuple[str, str]:
@@ -56,13 +67,9 @@ def resolve_style(style: str) -> tuple[str, str]:
     return next((k for k, v in STYLES.items() if v["style"] == style.strip()), "custom"), style
 
 
-def submit(style: str, lyrics: str, seed: int | None = None, cfg_scale: float | None = None,
-           clean_lyrics: bool = True) -> str:
-    inp = {"style": style, "lyrics": lyrics, "clean_lyrics": clean_lyrics}
-    if seed is not None:
-        inp["seed"] = seed
-    if cfg_scale is not None:
-        inp["cfg_scale"] = cfg_scale
+def submit(style: str, lyrics: str, seed: int, settings: dict, clean_lyrics: bool = True) -> str:
+    inp = {"style": style, "lyrics": lyrics, "clean_lyrics": clean_lyrics, "seed": seed}
+    inp |= {k: v for k, v in settings.items() if k in ("cfg_scale", "semantic_sampling", "abc_sampling")}
     return api("POST", "run", {"input": inp})["id"]
 
 
@@ -84,25 +91,42 @@ def wait(job_id: str, on_status=None, poll: float = 5, timeout: float = 1800) ->
         time.sleep(poll)
 
 
-def save(result: dict, name: str, style: str) -> Path | None:
+def save(result: dict, name: str, style: str, take: dict | None = None) -> Path | None:
     out = result.get("output") or {}
     if result.get("status") != "COMPLETED" or "audio_base64" not in out:
         return None
     OUT.mkdir(exist_ok=True)
-    stem = f"{time.strftime('%Y%m%d-%H%M%S')}-{re.sub(r'[^a-z0-9-]+', '-', name.lower())}-{out['seed']}"
+    tag = f"-{take['take']}" if take else ""
+    stem = f"{time.strftime('%Y%m%d-%H%M%S')}-{re.sub(r'[^a-z0-9-]+', '-', name.lower())}{tag}-{out['seed']}"
     mp3 = OUT / f"{stem}.mp3"
     mp3.write_bytes(base64.b64decode(out.pop("audio_base64")))
-    meta = {k: result.get(k) for k in ("id", "delayTime", "executionTime")} | out | {"style": style}
+    meta = {k: result.get(k) for k in ("id", "delayTime", "executionTime")} | (take or {}) | out | {"style": style}
     mp3.with_suffix(".json").write_text(json.dumps(meta, indent=1))
     return mp3
 
 
-def make(style: str, lyrics: str, takes: int = 1, seed: int | None = None, cfg_scale: float | None = None,
+def plan(takes: int, seed: int | None = None, cfg_scale: float | None = None) -> list[dict]:
+    """Settings per take: TAKE_PLAN cycled, consecutive seeds; --cfg-scale pins guidance for every take."""
+    base = seed if seed is not None else random.randrange(2**31 - 100)
+    out = []
+    for i in range(takes):
+        t = dict(TAKE_PLAN[i % len(TAKE_PLAN)])
+        if i >= len(TAKE_PLAN):
+            t["take"] += str(i // len(TAKE_PLAN) + 1)
+        if cfg_scale is not None:
+            t |= {"cfg_scale": cfg_scale, "note": f"guidance {cfg_scale} (set by hand)"}
+        out.append(t | {"seed": base + i})
+    return out
+
+
+def make(style: str, lyrics: str, takes: int = 2, seed: int | None = None, cfg_scale: float | None = None,
          clean_lyrics: bool = True, log=print) -> list[Path]:
     name, text = resolve_style(style)
-    seeds = [seed + i if seed is not None else None for i in range(takes)]
-    ids = [submit(text, lyrics, s, cfg_scale, clean_lyrics) for s in seeds]
-    log(f"submitted {len(ids)} job(s): {', '.join(ids)}")
+    takes_ = plan(takes, seed, cfg_scale)
+    ids = [submit(text, lyrics, t["seed"], t, clean_lyrics) for t in takes_]
+    for t, i in zip(takes_, ids):
+        log(f"take {t['take']} ({t['note']}, seed {t['seed']}): job {i}")
+    by_id = dict(zip(ids, takes_))
 
     def one(job_id: str) -> Path | None:
         last = [None]
@@ -113,10 +137,10 @@ def make(style: str, lyrics: str, takes: int = 1, seed: int | None = None, cfg_s
                 last[0] = st
 
         r = wait(job_id, on)
-        p = save(r, name, text)
+        p = save(r, name, text, by_id[job_id])
         if p:
             o = json.loads(p.with_suffix(".json").read_text())
-            log(f"{job_id}: {o['seconds']} s of song, generated in {o['gen_seconds']} s, "
+            log(f"take {o['take']}: {o['seconds']} s of song, generated in {o['gen_seconds']} s, "
                 f"queued {(r.get('delayTime') or 0) / 1000:.0f} s → {p}")
         else:
             log(f"{job_id}: {r.get('status')} {json.dumps(r.get('error') or r.get('output'))[:500]}")
@@ -130,9 +154,9 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--style", help="preset name or style text", required=False)
     ap.add_argument("--lyrics", help="lyrics file ('-' for stdin)")
-    ap.add_argument("--takes", type=int, default=1)
+    ap.add_argument("--takes", type=int, default=2, help="default 2: take A and B from TAKE_PLAN")
     ap.add_argument("--seed", type=int)
-    ap.add_argument("--cfg-scale", type=float)
+    ap.add_argument("--cfg-scale", type=float, help="same guidance for every take (overrides TAKE_PLAN)")
     ap.add_argument("--raw-lyrics", action="store_true", help="send lyrics untouched")
     ap.add_argument("--list-styles", action="store_true")
     ap.add_argument("--health", action="store_true", help="show endpoint workers and queue")

@@ -51,18 +51,28 @@ Background and the listening test behind every choice here are in `~/projects/yu
 Every push to `main` triggers a new build and rolls it out. To roll back, redeploy an earlier build from the console.
 
 ## Using it
+Like Suno, each request gives **2 takes**:
+- **Take A** uses the model defaults (guidance 1.0). It was the most reliable setting in the bake-off.
+- **Take B** uses stronger style guidance (1.2) and the next seed. On average it was slightly worse, but it was
+  the best take on some songs (Up and Out, Concrete Weather).
+
+The takes run as parallel jobs. To explore other directions for B, edit `TAKE_PLAN` in `client/ltbr_song.py`.
+The worker also accepts `semantic_sampling` / `abc_sampling` overrides (temperature, top_p, top_k,
+repetition_penalty). `--takes 4` gives A, B, A2 and B2, each with a new seed.
+
 ```
 python3 client/ltbr_song.py --list-styles
-python3 client/ltbr_song.py --style ridley-road-market --lyrics news.txt --takes 3
-python3 client/ltbr_song.py --style "English, 1980s UK lovers rock, ..." --lyrics news.txt --seed 7
+python3 client/ltbr_song.py --style ridley-road-market --lyrics news.txt          # takes A + B
+python3 client/ltbr_song.py --style "English, 1980s UK lovers rock, ..." --lyrics news.txt --seed 7 --takes 4
 python3 client/ltbr_song.py --health
 python3 client/web.py          # http://localhost:8802
 ```
-Each MP3 in `out/` has a `.json` beside it with the seed, timings, the lyrics as sent and the style. To re-make
-a take you liked, reuse its seed with the same style and lyrics.
+Each MP3 in `out/` is named `<time>-<style>-<take>-<seed>.mp3`. Beside it, a `.json` records the take's
+settings, seed, timings, the lyrics as sent and the style. To re-make a take exactly, reuse the same settings.
 
 The job API is a plain POST to `https://api.runpod.ai/v2/<endpoint>/run` with `{"input": {"style", "lyrics",
-"seed"?, "cfg_scale"?}}`, then polling `/status/<id>`. The radio system can call it the same way the client does.
+"seed"?, "cfg_scale"?, "semantic_sampling"?}}`, then polling `/status/<id>`. The radio system can call it the same
+way the client does.
 
 ## Costs and limits
 - **Price:** RTX 4090 serverless is $1.10/h, billed per second while a worker runs. A song is about
