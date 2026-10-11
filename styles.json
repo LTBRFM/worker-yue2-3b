@@ -1,0 +1,42 @@
+{
+ "concrete-weather": {
+  "label": "Concrete Weather (Electro-Funk / Boogie)",
+  "style": "English, 1984 electro-funk, Roland TR-808 drums, TB-303 synth bass, Juno and Prophet synths, sequencer arpeggios, vocoder lead with cool deadpan female spoken vocal, robotic and detached, Simmons drums, tape delay, dry cold production, 122 BPM",
+  "from": "http://lrd.local.net:3393/tracks/93b8112e-e8e6-46a6-94da-39450b9a6fb3"
+ },
+ "letters-from-berlin": {
+  "label": "Letters From Berlin (Lovers Rock)",
+  "style": "English, late 1970s UK lovers rock ballad, slow one-drop, sweet wistful female lead vocal with soft harmonies, warm walking bass, rim-click drums, brushed hi-hat, Wurlitzer electric piano, Hammond organ pads, soft tenor sax and muted trumpet, plate reverb, tape warmth, 74 BPM",
+  "from": "http://lrd.local.net:3393/tracks/29991b6a-16dd-4c23-9d78-5adcc9d4d5f2"
+ },
+ "mind-made-up": {
+  "label": "Mind Made Up (UK Street Soul)",
+  "style": "English, late-1980s UK street soul, powerful gospel-raised female belter with melismatic runs, gospel backing vocals, swung programmed drums, deep sub bass, Fender Rhodes, DX7 electric piano, clavinet riff, synth-string pads, warm soulful production, 104 BPM",
+  "from": "http://lrd.local.net:3393/tracks/d0a2a6e8-1898-4fc2-984d-2ac377d966fa"
+ },
+ "on-read": {
+  "label": "On Read (Playful melodic dubstep)",
+  "style": "English, playful melodic dubstep pop, clean breathy female lead vocal, echoing backing vocals, glossy half-time drop with soft sub-bass wobble, chopped pitched vocal hooks, crisp electronic drums, bright synths, phone notification chimes, 135 BPM",
+  "from": "http://lrd.local.net:3393/tracks/7c72dd88-c169-45a6-a7ad-c66d1ef828ae"
+ },
+ "ridley-road-market": {
+  "label": "Ridley Road Market (Deejay / Toasting)",
+  "style": "English with Jamaican patois, 1980s UK fast-chat deejay reggae, male toaster with rapid conversational comic delivery, group call-and-response hook, bouncy walking bass, crisp drums with rim-clicks, Hammond organ off-beat stabs, Wurlitzer, light tenor sax and trumpet, 90 BPM",
+  "from": "http://lrd.local.net:3393/tracks/c6d1c54b-5877-42f6-9215-842082403023"
+ },
+ "sunday-morning-hackney": {
+  "label": "Sunday Morning Hackney (Roots Reggae)",
+  "style": "English, late 1970s UK roots reggae, slow one-drop, warm male lead vocal with female harmonies, mellow horn section (tenor sax, flugelhorn, trombone) melodies and solo, walking bass, brushed drums, Hammond organ, Wurlitzer electric piano, analogue tape warmth, 72 BPM",
+  "from": "http://lrd.local.net:3393/tracks/08bdcd5e-6801-46d7-8b56-8b9a8f9786c2"
+ },
+ "up-and-out": {
+  "label": "Up and Out (Two-Tone / Ska)",
+  "style": "English, 1980 British 2-Tone ska, fast and joyful, male lead vocal with gang shout backing vocals, offbeat upstroke guitar, bouncing walking bass, punchy drums, bright brass section (trumpet, trombone, sax) fanfares and stabs, Vox organ, raw live band, 150 BPM",
+  "from": "http://lrd.local.net:3393/tracks/897c0d22-0d41-4218-87ef-1bb93b4fdc7e"
+ },
+ "wardour-street": {
+  "label": "Wardour Street (Brit-Funk / Jazz-Funk)",
+  "style": "English, early 1980s British Brit-funk, peak-time club, urgent male lead vocal with falsetto, driving slap bass, Linn drum machine with live drums, four-on-the-floor, punchy brass section (trumpet, sax, trombone) stabs throughout, wah-wah rhythm guitar, clavinet, 122 BPM",
+  "from": "http://lrd.local.net:3393/tracks/ee54e493-c013-4528-b4b4-8b159f152734"
+ }
+}
