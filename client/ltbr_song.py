@@ -70,7 +70,7 @@ def resolve_style(style: str) -> tuple[str, str]:
 
 def submit(style: str, lyrics: str, seed: int, settings: dict, clean_lyrics: bool = True) -> str:
     inp = {"style": style, "lyrics": lyrics, "clean_lyrics": clean_lyrics, "seed": seed}
-    inp |= {k: v for k, v in settings.items() if k in ("cfg_scale", "semantic_sampling", "abc_sampling")}
+    inp |= {k: v for k, v in settings.items() if k in ("cfg_scale", "semantic_sampling", "abc_sampling", "ode_steps")}
     return api("POST", "run", {"input": inp})["id"]
 
 

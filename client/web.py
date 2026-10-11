@@ -17,7 +17,9 @@ from pathlib import Path
 import ltbr_song as ls
 
 PORT = 8802
-EXAMPLE = (Path(__file__).parent / "example_lyrics.txt").read_text()
+EXAMPLES = {"short": (Path(__file__).parent / "example_short.txt").read_text(),
+            "full": (Path(__file__).parent / "example_lyrics.txt").read_text()}
+GROUPS = {"simple": "Disposable (simple arrangements)", "station": "Station songs (Suno remakes)"}
 REQS: list[dict] = []  # newest first
 LOCK = threading.Lock()
 
@@ -51,18 +53,21 @@ button{margin-top:14px;background:var(--accent);color:var(--bg);border:0;border-
 .log{font:12px/1.4 ui-monospace,monospace;white-space:pre-wrap} audio{width:100%;margin:6px 0}
 </style></head><body><h1>LTBR song maker</h1>
 <p><small>YuE2 on Runpod serverless (RTX 4090). About 80 s per 3½-minute song once a worker is warm; the first request
-after a quiet spell waits for a worker to start. Each take costs about $0.03.</small></p>
+after a quiet spell waits for a worker to start. Each take costs about $0.03; a short verse-and-chorus song
+(30–60 s) takes about 20 s and costs about $0.01. Best for simple, disposable tracks, not hits.</small></p>
 <form id="f"><label>Station style</label><select id="preset">__OPTIONS__<option value="">Custom (write below)</option></select>
 <label>Style text <small>sent to the model; edit freely. Short and structured works best: language, genre and era,
 vocal, instruments, tempo.</small></label><textarea id="style"></textarea>
-<label>Lyrics <small>[Verse] [Chorus] [Bridge] [Outro] tags; Suno-style notes in brackets are removed</small></label>
+<label>Lyrics <small>[Verse] [Chorus] [Bridge] [Outro] tags; Suno-style notes in brackets are removed. Example:
+<select id="ex" style="width:auto;padding:2px 6px"><option value="short">short (verse + chorus)</option><option value="full">full tube update</option></select></small></label>
 <textarea id="lyrics">__EXAMPLE__</textarea>
 <div class="row"><div><label>Takes <small>A = defaults, B = guidance 1.2</small></label><input id="takes" type="number" min="1" max="6" value="2"></div>
 <div><label>Seed <small>blank = random</small></label><input id="seed" type="number"></div>
 <div><label>Guidance <small>blank = per take</small></label><input id="cfg" type="number" step="0.1"></div></div>
 <button>Make song</button></form><div id="reqs"></div>
 <script>
-const S=__STYLES__, $=id=>document.getElementById(id);
+const S=__STYLES__, EX=__EXAMPLES__, $=id=>document.getElementById(id);
+$('ex').onchange=()=>{$('lyrics').value=EX[$('ex').value]};
 const fill=()=>{const p=$('preset').value; if(p) $('style').value=S[p].style};
 $('preset').onchange=fill; fill();
 $('f').onsubmit=async e=>{e.preventDefault();
@@ -88,9 +93,13 @@ class H(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         if self.path == "/":
-            opts = "".join(f'<option value="{k}">{html.escape(v["label"])}</option>' for k, v in ls.STYLES.items())
-            page = (PAGE.replace("__OPTIONS__", opts).replace("__EXAMPLE__", html.escape(EXAMPLE))
-                    .replace("__STYLES__", json.dumps(ls.STYLES)))
+            opts = "".join(
+                f'<optgroup label="{html.escape(title)}">' + "".join(
+                    f'<option value="{k}">{html.escape(v["label"])}</option>'
+                    for k, v in ls.STYLES.items() if v.get("group", "station") == g) + "</optgroup>"
+                for g, title in GROUPS.items())
+            page = (PAGE.replace("__OPTIONS__", opts).replace("__EXAMPLE__", html.escape(EXAMPLES["short"]))
+                    .replace("__STYLES__", json.dumps(ls.STYLES)).replace("__EXAMPLES__", json.dumps(EXAMPLES)))
             self.send(200, page.encode(), "text/html; charset=utf-8")
         elif self.path == "/api/state":
             with LOCK:

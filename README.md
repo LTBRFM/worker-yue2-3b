@@ -21,7 +21,8 @@ Background and the listening test behind every choice here are in `~/projects/yu
 | `handler.py` | The serverless worker. It loads YuE2 once per worker, then makes one song per job and returns the MP3 as base64. The input fields are in the docstring. |
 | `lyrics.py` | Suno-style lyrics → YuE2 section tags, with production notes dropped (from the bake-off). |
 | `Dockerfile` | python 3.12 + torch 2.10 (CUDA 12.8) + YuE2 at the tested commit. The VAE (0.5 GB) is built into the image; the 7.3 GB main model comes from Runpod's model cache. |
-| `styles.json` | Station style presets: the 8 condensed prompts from the bake-off, each linked to its source track. Add more freely. |
+| `styles.json` | Style presets. The 4 `simple` ones (keyboard man, busker ska, acoustic busker, jingle) are the default use: plain arrangements for disposable one-off tracks such as tube updates. The 8 `station` ones are the condensed prompts from the bake-off, each linked to its source track. Add more freely. |
+| `client/example_short.txt`, `client/example_lyrics.txt` | Example lyrics: a short verse + chorus (30–60 s, about $0.01 a take) and a full tube update. |
 | `client/ltbr_song.py` | Command-line client (standard library only). It sends N takes as N parallel jobs and saves them to `out/`. |
 | `client/web.py` | A local page at http://localhost:8802: preset, style text, lyrics, takes → players. |
 | `test_input.json` | A short sample job. |

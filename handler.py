@@ -9,6 +9,7 @@ Input (job["input"]):
     semantic_sampling, abc_sampling   dict, optional overrides of YuE2's sampling for the audio-token and the
                   score (ABC) stage: temperature, top_p, top_k, repetition_penalty. Defaults: semantic T 1.0,
                   top_p 0.95, top_k 100, rp 1.2; abc T 0.7, top_p 0.9, top_k 30, rp 1.005
+    ode_steps     int   = 32      audio synthesis steps (1-128); more may clean up the sound, and takes longer
     bitrate       str   = "192k"  lowered automatically if the MP3 would not fit in a job response
 
 Output: {audio_base64, format, seconds, gen_seconds, seed, cfg_scale, *_sampling, truncated, lyrics_sent, style_chars,
@@ -20,6 +21,7 @@ Local test on a GPU box:  python handler.py --test_input "$(cat test_input.json)
 from __future__ import annotations
 
 import base64
+import dataclasses
 import os
 import random
 import subprocess
@@ -59,6 +61,7 @@ print(f"loading {SRC} ({HOW}), vae {VAE_DIR}", flush=True)
 PIPE = YuE2Pipeline.from_pretrained(SRC, vae=VAE_DIR, revision=MODEL_REV if HOW == "hub-download" else None,
                                     device="cuda", progress=False)
 GPU = torch.cuda.get_device_name(0)
+DEFAULT_CONFIG = PIPE.generation_config
 print(f"ready in {time.time() - t0:.1f}s on {GPU}", flush=True)
 
 
@@ -87,11 +90,18 @@ def handler(job):
                 return {"error": f"{stage}: unknown keys {sorted(bad)}; allowed {sorted(SAMPLING_KEYS)}"}
             kw[stage] = {k: SAMPLING_KEYS[k](v) for k, v in inp[stage].items()}
 
+    steps = int(inp.get("ode_steps") or DEFAULT_CONFIG.ode_steps)
+    if not 1 <= steps <= 128:
+        return {"error": "ode_steps must be 1-128"}
+
     t = time.time()
+    PIPE.generation_config = dataclasses.replace(DEFAULT_CONFIG, ode_steps=steps)  # one job per worker at a time
     try:
         song = PIPE(**kw)
     except ValueError as e:  # bad sampling values etc.
         return {"error": f"invalid settings: {e}"}
+    finally:
+        PIPE.generation_config = DEFAULT_CONFIG
     gen = time.time() - t
     with tempfile.TemporaryDirectory() as d:
         flac = Path(d) / "song.flac"
@@ -105,7 +115,7 @@ def handler(job):
         else:
             return {"error": f"{seconds:.0f} s song does not fit in a job response even at {rate}"}
     return {"audio_base64": b64, "format": "mp3", "bitrate": rate, "seconds": round(seconds, 1),
-            "gen_seconds": round(gen, 1), "seed": seed, "cfg_scale": kw.get("cfg_scale", 1.0),
+            "gen_seconds": round(gen, 1), "seed": seed, "cfg_scale": kw.get("cfg_scale", 1.0), "ode_steps": steps,
             "semantic_sampling": kw.get("semantic_sampling"), "abc_sampling": kw.get("abc_sampling"), "truncated": song.truncated, "lyrics_sent": sent,
             "style_chars": len(style), "weights": f"{SRC.split('/')[-1][:12]} ({HOW})", "gpu": GPU}
 

@@ -1,42 +1,70 @@
 {
+ "keyboard-man": {
+  "label": "Simple: one man and a keyboard",
+  "group": "simple",
+  "style": "English, simple cheerful singalong, solo friendly male vocal, one electric piano playing plain major chords, no drums, no band, dry intimate room recording, light and warm, 100 BPM"
+ },
+ "busker-ska": {
+  "label": "Simple: small busker ska band",
+  "group": "simple",
+  "style": "English, small busker ska band, cheerful male lead vocal, offbeat upstroke guitar, simple walking bass, light snare and hi-hat, one trumpet, raw live room sound, 140 BPM"
+ },
+ "acoustic-busker": {
+  "label": "Simple: acoustic guitar busker",
+  "group": "simple",
+  "style": "English, street-corner acoustic busker, warm friendly male vocal, one strummed acoustic guitar, simple chords, no drums, natural open-air sound, 110 BPM"
+ },
+ "station-jingle": {
+  "label": "Simple: radio station jingle",
+  "group": "simple",
+  "style": "English, short upbeat radio station jingle, bright group vocal harmonies, simple piano and bass, light drums, clean and catchy, 120 BPM"
+ },
  "concrete-weather": {
   "label": "Concrete Weather (Electro-Funk / Boogie)",
   "style": "English, 1984 electro-funk, Roland TR-808 drums, TB-303 synth bass, Juno and Prophet synths, sequencer arpeggios, vocoder lead with cool deadpan female spoken vocal, robotic and detached, Simmons drums, tape delay, dry cold production, 122 BPM",
-  "from": "http://lrd.local.net:3393/tracks/93b8112e-e8e6-46a6-94da-39450b9a6fb3"
+  "from": "http://lrd.local.net:3393/tracks/93b8112e-e8e6-46a6-94da-39450b9a6fb3",
+  "group": "station"
  },
  "letters-from-berlin": {
   "label": "Letters From Berlin (Lovers Rock)",
   "style": "English, late 1970s UK lovers rock ballad, slow one-drop, sweet wistful female lead vocal with soft harmonies, warm walking bass, rim-click drums, brushed hi-hat, Wurlitzer electric piano, Hammond organ pads, soft tenor sax and muted trumpet, plate reverb, tape warmth, 74 BPM",
-  "from": "http://lrd.local.net:3393/tracks/29991b6a-16dd-4c23-9d78-5adcc9d4d5f2"
+  "from": "http://lrd.local.net:3393/tracks/29991b6a-16dd-4c23-9d78-5adcc9d4d5f2",
+  "group": "station"
  },
  "mind-made-up": {
   "label": "Mind Made Up (UK Street Soul)",
   "style": "English, late-1980s UK street soul, powerful gospel-raised female belter with melismatic runs, gospel backing vocals, swung programmed drums, deep sub bass, Fender Rhodes, DX7 electric piano, clavinet riff, synth-string pads, warm soulful production, 104 BPM",
-  "from": "http://lrd.local.net:3393/tracks/d0a2a6e8-1898-4fc2-984d-2ac377d966fa"
+  "from": "http://lrd.local.net:3393/tracks/d0a2a6e8-1898-4fc2-984d-2ac377d966fa",
+  "group": "station"
  },
  "on-read": {
   "label": "On Read (Playful melodic dubstep)",
   "style": "English, playful melodic dubstep pop, clean breathy female lead vocal, echoing backing vocals, glossy half-time drop with soft sub-bass wobble, chopped pitched vocal hooks, crisp electronic drums, bright synths, phone notification chimes, 135 BPM",
-  "from": "http://lrd.local.net:3393/tracks/7c72dd88-c169-45a6-a7ad-c66d1ef828ae"
+  "from": "http://lrd.local.net:3393/tracks/7c72dd88-c169-45a6-a7ad-c66d1ef828ae",
+  "group": "station"
  },
  "ridley-road-market": {
   "label": "Ridley Road Market (Deejay / Toasting)",
   "style": "English with Jamaican patois, 1980s UK fast-chat deejay reggae, male toaster with rapid conversational comic delivery, group call-and-response hook, bouncy walking bass, crisp drums with rim-clicks, Hammond organ off-beat stabs, Wurlitzer, light tenor sax and trumpet, 90 BPM",
-  "from": "http://lrd.local.net:3393/tracks/c6d1c54b-5877-42f6-9215-842082403023"
+  "from": "http://lrd.local.net:3393/tracks/c6d1c54b-5877-42f6-9215-842082403023",
+  "group": "station"
  },
  "sunday-morning-hackney": {
   "label": "Sunday Morning Hackney (Roots Reggae)",
   "style": "English, late 1970s UK roots reggae, slow one-drop, warm male lead vocal with female harmonies, mellow horn section (tenor sax, flugelhorn, trombone) melodies and solo, walking bass, brushed drums, Hammond organ, Wurlitzer electric piano, analogue tape warmth, 72 BPM",
-  "from": "http://lrd.local.net:3393/tracks/08bdcd5e-6801-46d7-8b56-8b9a8f9786c2"
+  "from": "http://lrd.local.net:3393/tracks/08bdcd5e-6801-46d7-8b56-8b9a8f9786c2",
+  "group": "station"
  },
  "up-and-out": {
   "label": "Up and Out (Two-Tone / Ska)",
   "style": "English, 1980 British 2-Tone ska, fast and joyful, male lead vocal with gang shout backing vocals, offbeat upstroke guitar, bouncing walking bass, punchy drums, bright brass section (trumpet, trombone, sax) fanfares and stabs, Vox organ, raw live band, 150 BPM",
-  "from": "http://lrd.local.net:3393/tracks/897c0d22-0d41-4218-87ef-1bb93b4fdc7e"
+  "from": "http://lrd.local.net:3393/tracks/897c0d22-0d41-4218-87ef-1bb93b4fdc7e",
+  "group": "station"
  },
  "wardour-street": {
   "label": "Wardour Street (Brit-Funk / Jazz-Funk)",
   "style": "English, early 1980s British Brit-funk, peak-time club, urgent male lead vocal with falsetto, driving slap bass, Linn drum machine with live drums, four-on-the-floor, punchy brass section (trumpet, sax, trombone) stabs throughout, wah-wah rhythm guitar, clavinet, 122 BPM",
-  "from": "http://lrd.local.net:3393/tracks/ee54e493-c013-4528-b4b4-8b159f152734"
+  "from": "http://lrd.local.net:3393/tracks/ee54e493-c013-4528-b4b4-8b159f152734",
+  "group": "station"
  }
 }
